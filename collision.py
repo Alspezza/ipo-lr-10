@@ -1,3 +1,4 @@
+import sys
 class RectCorrectError (Exception):
     pass
 def isCorrectRect(m,n):
@@ -11,7 +12,7 @@ n = (2,4)
 
 
 rect1 = [(1,1),(5,5)]
-rect2 = [(2,3),(6,8)]
+rect2 = [(2,3),(6,2)]
 
 def isCollisionRect(rect1, rect2):
     if rect1[0][0] < rect1[1][0] and rect1[0][1] < rect1[1][1]:
@@ -43,24 +44,19 @@ def intersectionAreaRect(rect1,rect2):
         else:
             x_left = max(r1x1, r2x1)
             x_right = min(r1x2, r2x2)
-          
+        # Пересечение по оси Y
             y_bottom = max(r1y1, r2y1)
             y_top = min(r1y2, r2y2)
-          
+        # Вычисляем ширину и высоту пересечения
             width = x_right - x_left
             height = y_top - y_bottom
             S = width * height
             return S
     except RectCorrectError as e:
         raise ValueError(f"В функцию был передан некорректный прямоугольник: {e}")
-        
 
-rectangles = [
-    [(-3, 1), (9, 10)],
-    [(-7, 0), (13, 10)],
-    [(0, 0), (5, 5)],
-    [(2, 2), (7, 7)]
-]
+        
+rectangles = []
 
 def intersectionAreaMultiRect(rectangles):
 
@@ -69,19 +65,49 @@ def intersectionAreaMultiRect(rectangles):
         x2, y2 = rect[1]
         if x1 >= x2 or y1 >= y2:
             raise RectCorrectError(f"Прямоугольник {num} не существует")
-
-    xleft_result = ydown_result = 1000
-    xright_result = ytop_result = -1000
+        
+    if not rectangles:
+        return 0 
+    
+    xleft_result = ydown_result = -1000
+    xright_result = ytop_result = 1000
     for i in range(0, len(rectangles)):
         xleft, ydown = rectangles[i][0]
         xright, ytop = rectangles[i][1]
-        xleft_result = min(xleft, xleft_result)
-        ydown_result = min(ydown, ydown_result)
-        xright_result = max(xright, xright_result)
-        ytop_result = max(ytop, ytop_result)
+        xleft_result = max(xleft, xleft_result)
+        ydown_result = max(ydown, ydown_result)
+        xright_result = min(xright, xright_result)
+        ytop_result = min(ytop, ytop_result)
     #return [(xleft_result, ydown_result ),(xright_result, ytop_result)]
     width = xright_result - xleft_result 
     length = ytop_result - ydown_result 
     S = width * length
     return S
-print(intersectionAreaMultiRect(rectangles))
+
+
+
+try:
+        kolvo = int(input("Введите количество прямоугольников: "))
+        if kolvo <= 0:
+            print("Некорректно введено количество прямоугольников. ")
+            sys.exit(1)
+            
+        print(f"Введите координаты {kolvo} прямоугольников")
+        
+        for i in range(kolvo):
+            print(f"\nПрямоугольник {i+1}: ")
+            left_down_x = float(input("Введите x левого нижнего угла: "))
+            left_down_y = float(input("Введите y левого нижнего угла: "))
+            right_up_x = float(input("Введите x правого верхнего угла: "))
+            right_up_y = float(input("Введите y правого верхнего угла: "))
+            
+            rectangles.append([(left_down_x, left_down_y), (right_up_x, right_up_y)])
+        
+        area = intersectionAreaMultiRect(rectangles)
+        
+        if area > 0:
+            print(f"Площадь пересечения всех прямоугольников: {area}")
+        else:
+            print(f"У прямоугольников нет общего пересечения.")
+except ValueError:
+    print("Числа введены некорректно")
